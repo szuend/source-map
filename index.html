@@ -1490,7 +1490,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 6270e4735, updated Tue Aug 6 12:12:30 2024 -0700" name="generator">
   <link href="https://tc39.es/source-map/" rel="canonical">
-  <meta content="501c85c79def637ebf90c65a577c3dbf8c1430cd" name="revision">
+  <meta content="f7efad964e993cc869c954fd15d907955987bddf" name="revision">
   <meta content="dark light" name="color-scheme">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
@@ -2172,7 +2172,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Source Map</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="profile-and-date"><span class="content">Stage 0: Strawman, <time class="dt-updated" datetime="2024-09-19">19 September 2024</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="profile-and-date"><span class="content">Stage 0: Strawman, <time class="dt-updated" datetime="2024-09-27">27 September 2024</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2255,13 +2255,13 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <main>
    <h2 class="no-num no-toc heading settled" id="about-this-specification"><span class="content">About this Specification</span></h2>
    <p>The document at <a href="https://tc39.es/source-map/">https://tc39.es/source-map/</a> is the most accurate and
-up-to-date Source Map specification. It contains the content of the most recently published snapshot
+up-to-date source map specification. It contains the content of the most recently published snapshot
 plus any modifications that will be included in the next snapshot.</p>
-   <p>If you want to get involved you will find more information under the following <a href="https://github.com/tc39/source-map">Specification
-Repository</a>.</p>
+   <p>If you want to get involved you will find more information at the <a href="https://github.com/tc39/source-map">specification
+repository</a>.</p>
    <h2 class="no-num heading settled" id="introduction"><span class="content">Introduction</span></h2>
-   <p>This Ecma standard defines the Source Map format, used for mapping transpiled source code back to the original sources.</p>
-   <p>The Source Maps format has the following goals:</p>
+   <p>This Ecma Standard defines the Source Map Format, used for mapping transpiled source code back to the original sources.</p>
+   <p>The source map format has the following goals:</p>
    <ul>
     <li data-md>
      <p>Support source-level debugging allowing bidirectional mapping</p>
@@ -2271,13 +2271,13 @@ Repository</a>.</p>
    <p>The original source map format (v1) was created by Joseph Schorr for use by
 Closure Inspector to enable source-level debugging of optimized JavaScript code
 (although the format itself is language agnostic).  However, as the size of the
-projects using the source maps expanded the verbosity of the format started to
-become a problem.  The v2 <a data-link-type="biblio" href="#biblio-v2format" title="Source Map Revision 2 Proposal">[V2Format]</a> was created by trading some simplicity
+projects using source maps expanded, the verbosity of the format started to
+become a problem.  The v2 format <a data-link-type="biblio" href="#biblio-v2format" title="Source Map Revision 2 Proposal">[V2Format]</a> was created by trading some simplicity
 and flexibility to reduce the overall size of the source map. Even with the
 changes made with the v2 version of the format, the source map file size was
 limiting its usefulness.  The v3 format is based on suggestions made by
 Pavel Podivilov (Google).</p>
-   <p>The Source Map format does not have version numbers anymore, and it is instead
+   <p>The source map format does not have version numbers anymore, and it is instead
 hard-coded to always be "3".</p>
    <div id="copyright-before" style="display: none"></div>
    <div id="copyright" style="display: none">
@@ -2316,7 +2316,7 @@ IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.</p>
   <h1 id="pdf-title" style="display: none" id="print-title">Source Map specification</h1>
 `)</script>
    <h2 class="heading settled" data-level="1" id="scope"><span class="secno">1. </span><span class="content">Scope</span><a class="self-link" href="#scope"></a></h2>
-   <p>This Standard defines the Source Map format.</p>
+   <p>This Standard defines the Source Map Format.</p>
    <h2 class="heading settled" data-level="2" id="terminology"><span class="secno">2. </span><span class="content">Terms and definitions</span><a class="self-link" href="#terminology"></a></h2>
    <p>For the purposes of this document, the following terms and definitions apply.</p>
    <dl>
@@ -2347,16 +2347,16 @@ The decoding of this VLQ string is the number -10. </div>
      <p>The URL referencing the location of a source map from the <a data-link-type="dfn" href="#generated-code" id="ref-for-generated-code">Generated code</a>.</p>
     <dt data-md><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="column">Column</dfn>
     <dd data-md>
-     <p>The 0 (zero) indexed offsets within a line of the generated code measured. The definition for
-  columns in source maps can depend on the content type.  For JavaScript and CSS based source
-  maps are defined to be in UTF-16 code units analogous to JavaScript string indexes. That means
-  that "A" (<code class="highlight">LATIN CAPITAL LETTER A</code>) measures 1 code unit, and "🔥" (<code class="highlight">FIRE</code>) measures 2 code
+     <p>The zero-based indexed offset within a line of the generated code. How this offset is
+  measured can depend on the content type.  For JavaScript and CSS based source
+  maps, they are defined to be in UTF-16 code units analogous to JavaScript string indices. That means
+  that "A" (<code class="highlight">LATIN CAPITAL LETTER A</code>) measures as 1 code unit, and "🔥" (<code class="highlight">FIRE</code>) measures as 2 code
   units.  For WebAssembly, columns are defined as byte offsets from the beginning of the binary
   content (and there is only one group representing a line). Source maps for other content types
-  might diverge from this.</p>
+  may diverge from this.</p>
    </dl>
    <h2 class="heading settled" data-level="3" id="source-map-format"><span class="secno">3. </span><span class="content">Source Map Format</span><a class="self-link" href="#source-map-format"></a></h2>
-   <p>The source map is a JSON document containing a top-level JSON object with the
+   <p>A source map is a JSON document containing a top-level JSON object with the
 following structure:</p>
 <pre class="language-json highlight"><c- p>{</c->
   <c- f>"version"</c-> <c- p>:</c-> <c- mi>3</c-><c- p>,</c->
@@ -2371,25 +2371,25 @@ following structure:</p>
 </pre>
    <ul>
     <li data-md>
-     <p><dfn class="dfn-paneled" data-dfn-for="json" data-dfn-type="dfn" data-noexport id="json-version"><code class="highlight">version</code></dfn> is the version field which must always be the number <code class="highlight"><c- mf>3</c-></code> as an integer. The source map may be rejected in case of a value different from <code class="highlight"><c- mf>3</c-></code>.</p>
+     <p><dfn class="dfn-paneled" data-dfn-for="json" data-dfn-type="dfn" data-noexport id="json-version"><code class="highlight">version</code></dfn> is the version field which must always be the number <code class="highlight"><c- mf>3</c-></code> as an integer. The source map may be rejected if the field has any other value.</p>
     <li data-md>
      <p><dfn class="dfn-paneled" data-dfn-for="json" data-dfn-type="dfn" data-noexport id="json-file"><code class="highlight">file</code></dfn> is an optional name of the generated code
 that this source map is associated with. It’s not specified if this can
-be a URL, relative path name, or just a base name. As such it has a mostly informal
-character.</p>
+be a URL, relative path name, or just a base name. Source map generators may
+choose the appropriate interpretation for their contexts of use.</p>
     <li data-md>
-     <p><dfn class="dfn-paneled" data-dfn-for="json" data-dfn-type="dfn" data-noexport id="json-sourceroot"><code class="highlight">sourceRoot</code></dfn> is an optional source root,
-useful for relocating source files on a server or removing repeated values in
-the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources">sources</a> entry.  This value is prepended to the individual entries in the
-"source" field.</p>
+     <p><dfn class="dfn-paneled" data-dfn-for="json" data-dfn-type="dfn" data-noexport id="json-sourceroot"><code class="highlight">sourceRoot</code></dfn> is an optional source root string,
+used for relocating source files on a server or removing repeated values in
+the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources">sources</a> entry.  This value is prepended to the individual entries in the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources①">sources</a> field.</p>
     <li data-md>
      <p><dfn class="dfn-paneled" data-dfn-for="json" data-dfn-type="dfn" data-noexport id="json-sources"><code class="highlight">sources</code></dfn> is a list of original sources
 used by the <a data-link-type="dfn" href="#json-mappings" id="ref-for-json-mappings">mappings</a> entry.  Each entry is either a string that is a
 (potentially relative) URL or <code class="highlight"><c- kc>null</c-></code> if the source name is not known.</p>
     <li data-md>
      <p><dfn class="dfn-paneled" data-dfn-for="json" data-dfn-type="dfn" data-noexport id="json-sourcescontent"><code class="highlight">sourcesContent</code></dfn> is an optional list
-of source content (that is the <a data-link-type="dfn" href="#original-source" id="ref-for-original-source">Original Source</a>), useful when the "source"
-can’t be hosted.  The contents are listed in the same order as the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources①">sources</a>. <code class="highlight"><c- kc>null</c-></code> may be used if some original sources should be retrieved by name.</p>
+of source content (i.e., the <a data-link-type="dfn" href="#original-source" id="ref-for-original-source">Original Source</a>) strings, used when the source
+cannot be hosted.  The contents are listed in the same order as the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources②">sources</a>.
+Entries may be <code class="highlight"><c- kc>null</c-></code> if some original sources should be retrieved by name.</p>
     <li data-md>
      <p><dfn class="dfn-paneled" data-dfn-for="json" data-dfn-type="dfn" data-noexport id="json-names"><code class="highlight">names</code></dfn> is an optional list of symbol names which may be used by the <a data-link-type="dfn" href="#json-mappings" id="ref-for-json-mappings①">mappings</a> entry.</p>
     <li data-md>
@@ -2399,7 +2399,7 @@ can’t be hosted.  The contents are listed in the same order as the <a data-lin
 should be considered third party code, such as framework code or bundler-generated code. This
 allows developer tools to avoid code that developers likely don’t want to see
 or step through, without requiring developers to configure this beforehand.
-It refers to the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources②">sources</a> array and lists the indices of all the known third-party sources
+It refers to the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources③">sources</a> array and lists the indices of all the known third-party sources
 in the source map. Some browsers may also use the deprecated <code class="highlight">x_google_ignoreList</code> field if <code class="highlight"><a data-link-type="dfn" href="#json-ignorelist" id="ref-for-json-ignorelist">ignoreList</a></code> is not present.</p>
    </ul>
    <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="decoded-source-map">decoded source map</dfn> is a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct">struct</a> with the following fields:</p>
@@ -2574,22 +2574,22 @@ following steps:</p>
 If this is the first field of the first segment, or the first segment following a new generated
 line (<code class="highlight"><c- p>;</c-></code>), then this field holds the whole <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq②">Base64 VLQ</a>.  Otherwise, this field contains
 a <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq③">Base64 VLQ</a> that is relative to the previous occurrence of this field. <em>Note that this
-is different than the fields below because the previous value is reset after every generated line.</em></p>
+is different from the subsequent fields below because the previous value is reset after every generated line.</em></p>
     <li data-md>
-     <p>If present, a zero-based index into the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources③">sources</a> list. This field is a <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq④">Base64 VLQ</a> relative to the previous occurrence of this field, unless this is the first occurrence of this
+     <p>If present, the zero-based index into the <a data-link-type="dfn" href="#json-sources" id="ref-for-json-sources④">sources</a> list. This field contains a <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq④">Base64 VLQ</a> relative to the previous occurrence of this field, unless it is the first occurrence of this
 field, in which case the whole value is represented.</p>
     <li data-md>
-     <p>If present, the zero-based starting line in the original source is represented.  This field is a <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq⑤">Base64 VLQ</a> relative to the previous occurrence of this field, unless this is the first
-occurrence of this field, in which case the whole value is represented.  Always present if there
+     <p>If present, the zero-based starting line in the original source.  This field contains a <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq⑤">Base64 VLQ</a> relative to the previous occurrence of this field, unless it is the first
+occurrence of this field, in which case the whole value is represented.  Must be present if there
 is a source field.</p>
     <li data-md>
-     <p>If present, the zero-based starting <a data-link-type="dfn" href="#column" id="ref-for-column①">column</a> of the line in the source represented. This
-field is a <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq⑥">Base64 VLQ</a> relative to the previous occurrence of this field unless this
-is the first occurrence of this field, in which case the whole value is represented.  Always
-present if there is a source field.</p>
+     <p>If present, the zero-based starting <a data-link-type="dfn" href="#column" id="ref-for-column①">column</a> of the line in the original source.  This
+field contains a <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq⑥">Base64 VLQ</a> relative to the previous occurrence of this field, unless it
+is the first occurrence of this field, in which case the whole value is represented.  Must
+be present if there is a source field.</p>
     <li data-md>
-     <p>If present, the zero-based index into the <a data-link-type="dfn" href="#json-names" id="ref-for-json-names">names</a> list associated with this segment. This
-field is a base 64 VLQ relative to the previous occurrence of this field unless this
+     <p>If present, the zero-based index into the <a data-link-type="dfn" href="#json-names" id="ref-for-json-names">names</a> list associated with this segment.  This
+field contains a <a data-link-type="dfn" href="#base64-vlq" id="ref-for-base64-vlq⑦">Base64 VLQ</a> relative to the previous occurrence of this field, unless it
 is the first occurrence of this field, in which case the whole value is represented.</p>
    </ol>
    <p class="note" role="note"><span class="marker">Note:</span> The purpose of this encoding is to reduce the source map size. VLQ encoding reduced source maps by 50% relative to the <a data-link-type="biblio" href="#biblio-v2format" title="Source Map Revision 2 Proposal">[V2Format]</a> in tests performed
@@ -2619,24 +2619,7 @@ misaligned with the original due to platform-specific line endings.</p>
 sources</a> <dfn class="dfn-paneled" data-dfn-for="decode source map mappings" data-dfn-type="dfn" data-noexport id="decode-source-map-mappings-sources"><var>sources</var></dfn>, run the following steps:</p>
    <ol>
     <li data-md>
-     <p>If <var>mappings</var> is not an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ascii-string" id="ref-for-ascii-string">ASCII string</a>, throw an error.</p>
-    <li data-md>
-     <p>If <var>mappings</var> contains any <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#code-unit" id="ref-for-code-unit">code unit</a> other than:</p>
-     <ul>
-      <li data-md>
-       <p>U+002C (,) or U+003B (;);</p>
-      <li data-md>
-       <p>U+0030 (0) to U+0039 (9);</p>
-      <li data-md>
-       <p>U+0041 (A) to U+005A (Z);</p>
-      <li data-md>
-       <p>U+0061 (a) to U+007A (z);</p>
-      <li data-md>
-       <p>U+002B (+), U+002F (/)</p>
-     </ul>
-     <p class="note" role="note"><span class="marker">NOTE:</span> These are the valid <a data-link-type="biblio" href="#biblio-base64" title="The Base16, Base32, and Base64 Data Encodings">[base64]</a> characters (excluding the padding character <code class="highlight"><c- o>=</c-></code>), together
-with <code class="highlight"><c- p>,</c-></code> and <code class="highlight"><c- p>;</c-></code>.</p>
-     <p>then throw an error.</p>
+     <p><a data-link-type="dfn" href="#validate-base64-vlq-groupings" id="ref-for-validate-base64-vlq-groupings">Validate base64 VLQ groupings</a> with <var>mappings</var>.</p>
     <li data-md>
      <p>Let <var>decodedMappings</var> be a new empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①⑦">list</a>.</p>
     <li data-md>
@@ -2735,7 +2718,29 @@ error</a>.</p>
     <li data-md>
      <p>Return <var>decodedMappings</var>.</p>
    </ol>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="decode-a-base64-vlq">decode a base64 VLQ</dfn> from a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①④">string</a> <var>segment</var> given a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string-position-variable" id="ref-for-string-position-variable①">position variable</a> <var>position</var>, run the following steps:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="validate-base64-vlq-groupings">validate base64 VLQ groupings</dfn> from a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①④">string</a> <var>groupings</var>, run the following steps:</p>
+   <ol>
+    <li data-md>
+     <p>If <var>groupings</var> is not an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ascii-string" id="ref-for-ascii-string">ASCII string</a>, throw an error.</p>
+    <li data-md>
+     <p>If <var>groupings</var> contains any <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#code-unit" id="ref-for-code-unit">code unit</a> other than:</p>
+     <ul>
+      <li data-md>
+       <p>U+002C (,) or U+003B (;);</p>
+      <li data-md>
+       <p>U+0030 (0) to U+0039 (9);</p>
+      <li data-md>
+       <p>U+0041 (A) to U+005A (Z);</p>
+      <li data-md>
+       <p>U+0061 (a) to U+007A (z);</p>
+      <li data-md>
+       <p>U+002B (+), U+002F (/)</p>
+     </ul>
+     <p class="note" role="note"><span class="marker">NOTE:</span> These are the valid <a data-link-type="biblio" href="#biblio-base64" title="The Base16, Base32, and Base64 Data Encodings">[base64]</a> characters (excluding the padding character <code class="highlight"><c- o>=</c-></code>), together
+with <code class="highlight"><c- p>,</c-></code> and <code class="highlight"><c- p>;</c-></code>.</p>
+     <p>then throw an error.</p>
+   </ol>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="decode-a-base64-vlq">decode a base64 VLQ</dfn> from a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑤">string</a> <var>segment</var> given a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string-position-variable" id="ref-for-string-position-variable①">position variable</a> <var>position</var>, run the following steps:</p>
    <ol>
     <li data-md>
      <p>If <var>position</var> points to the end of <var>segment</var>, return null.</p>
@@ -2789,9 +2794,9 @@ error</a>.</p>
    <p>If the sources are not absolute URLs after prepending the <a data-link-type="dfn" href="#json-sourceroot" id="ref-for-json-sourceroot">sourceRoot</a>, the sources are
 resolved relative to the SourceMap (like resolving the script <code class="highlight">src</code> attribute in an HTML document).</p>
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="decode-source-map-sources">decode source map sources</dfn> given a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url③">URL</a> <var>baseURL</var>,
-a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑤">string</a> or null <dfn class="dfn-paneled" data-dfn-for="decode source map sources" data-dfn-type="dfn" data-noexport id="decode-source-map-sources-sourceroot"><var>sourceRoot</var></dfn>,
-a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①⑧">list</a> of either <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑥">strings</a> or nulls <dfn class="dfn-paneled" data-dfn-for="decode source map sources" data-dfn-type="dfn" data-noexport id="decode-source-map-sources-sources"><var>sources</var></dfn>,
-a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①⑨">list</a> of either <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑦">strings</a> or nulls <dfn class="dfn-paneled" data-dfn-for="decode source map sources" data-dfn-type="dfn" data-noexport id="decode-source-map-sources-sourcescontent"><var>sourcesContent</var></dfn>,
+a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑥">string</a> or null <dfn class="dfn-paneled" data-dfn-for="decode source map sources" data-dfn-type="dfn" data-noexport id="decode-source-map-sources-sourceroot"><var>sourceRoot</var></dfn>,
+a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①⑧">list</a> of either <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑦">strings</a> or nulls <dfn class="dfn-paneled" data-dfn-for="decode source map sources" data-dfn-type="dfn" data-noexport id="decode-source-map-sources-sources"><var>sources</var></dfn>,
+a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list①⑨">list</a> of either <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑧">strings</a> or nulls <dfn class="dfn-paneled" data-dfn-for="decode source map sources" data-dfn-type="dfn" data-noexport id="decode-source-map-sources-sourcescontent"><var>sourcesContent</var></dfn>,
 and a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list②⓪">list</a> of numbers <dfn class="dfn-paneled" data-dfn-for="decode source map sources" data-dfn-type="dfn" data-noexport id="decode-source-map-sources-ignoredsources"><var>ignoredSources</var></dfn>,
 run the following steps:</p>
    <ol>
@@ -2907,15 +2912,16 @@ support in order to add an HTTP header and the second requires an annotation in 
 characters outside the set permitted to appear in URIs must be percent-encoded
 and it may be a data URI.  Using a data URI along with <a data-link-type="dfn" href="#json-sourcescontent" id="ref-for-json-sourcescontent">sourcesContent</a> allows
 for a completely self-contained source map.</p>
-   <ins>The HTTP <code class="highlight">sourcemap</code> header has precedence over a source annotation, and if both are present,
-the header URL should be used to resolve the source map file.</ins>
+   <p>The HTTP <code class="highlight">sourcemap</code> header has precedence over a source annotation, and if both are present,
+the header URL should be used to resolve the source map file.</p>
    <p>Regardless of the method used to retrieve the <a data-link-type="dfn" href="#source-mapping-url" id="ref-for-source-mapping-url">Source Mapping URL</a> the same
 process is used to resolve it, which is as follows:</p>
    <p>When the <a data-link-type="dfn" href="#source-mapping-url" id="ref-for-source-mapping-url①">Source Mapping URL</a> is not absolute, then it is relative to the generated code’s <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="source-origin">source origin</dfn>. The <a data-link-type="dfn" href="#source-origin" id="ref-for-source-origin">source origin</a> is determined by one of the following cases:</p>
    <ul>
     <li data-md>
      <p>If the generated source is not associated with a script element that has a <code class="highlight">src</code> attribute and there exists a <code class="highlight"><c- c1>//# sourceURL</c-></code> comment in the generated code, that
-comment should be used to determine the <a data-link-type="dfn" href="#source-origin" id="ref-for-source-origin①">source origin</a>. Note: Previously, this was <code class="highlight"><c- c1>//@ sourceURL</c-></code>, as with <code class="highlight"><c- c1>//@ sourceMappingURL</c-></code>, it is reasonable to accept both
+comment should be used to determine the <a data-link-type="dfn" href="#source-origin" id="ref-for-source-origin①">source origin</a>.</p>
+     <p class="note" role="note"><span class="marker">Note:</span> Previously, this was <code class="highlight"><c- c1>//@ sourceURL</c-></code>, as with <code class="highlight"><c- c1>//@ sourceMappingURL</c-></code>, it is reasonable to accept both
 but <code class="highlight"><c- c1>//#</c-></code> is preferred.</p>
     <li data-md>
      <p>If the generated code is associated with a script element and the script element has
@@ -2954,7 +2960,7 @@ produces an output file that links to a source map, it must do so <a data-link-t
     <p>Extracing a Source Map URL from it <a data-link-type="dfn" href="#extract-a-source-map-url-from-javascript-through-parsing" id="ref-for-extract-a-source-map-url-from-javascript-through-parsing">through parsing</a> gives null, while <a data-link-type="dfn" href="#extract-a-source-map-url-from-javascript-without-parsing" id="ref-for-extract-a-source-map-url-from-javascript-without-parsing">without parsing</a> gives <code class="highlight">foo<c- p>.</c->js<c- p>.</c->map</code>.</p>
    </div>
    <h5 class="heading settled" data-level="5.2.2.1" id="extraction-methods-for-javascript-sources"><span class="secno">5.2.2.1. </span><span class="content">Extraction methods for JavaScript sources</span><a class="self-link" href="#extraction-methods-for-javascript-sources"></a></h5>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="extract-a-source-map-url-from-javascript-through-parsing">extract a Source Map URL from JavaScript through parsing</dfn> a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑧">string</a> <var>source</var>,
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="extract-a-source-map-url-from-javascript-through-parsing">extract a Source Map URL from JavaScript through parsing</dfn> a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑨">string</a> <var>source</var>,
 run the following steps:</p>
    <ol>
     <li data-md>
@@ -2967,12 +2973,12 @@ run the following steps:</p>
       <li data-md>
        <p>Let <var>comment</var> be the content of <var>token</var>.</p>
       <li data-md>
-       <p>If <a data-link-type="dfn" href="#match-a-source-map-url-in-a-comment" id="ref-for-match-a-source-map-url-in-a-comment">matching a Source Map URL in</a> <var>comment</var> returns a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①⑨">string</a>, return it.</p>
+       <p>If <a data-link-type="dfn" href="#match-a-source-map-url-in-a-comment" id="ref-for-match-a-source-map-url-in-a-comment">matching a Source Map URL in</a> <var>comment</var> returns a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②⓪">string</a>, return it.</p>
      </ol>
     <li data-md>
      <p>Return null.</p>
    </ol>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="extract-a-source-map-url-from-javascript-without-parsing">extract a Source Map URL from JavaScript without parsing</dfn> a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②⓪">string</a> <var>source</var>,
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-export id="extract-a-source-map-url-from-javascript-without-parsing">extract a Source Map URL from JavaScript without parsing</dfn> a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②①">string</a> <var>source</var>,
 run the following steps:</p>
    <ol>
     <li data-md>
@@ -3010,7 +3016,7 @@ white space code points</a> from <var>line</var> given <var>position</var>.</p>
             <li data-md>
              <p>Let <var>comment</var> be the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#code-point-substring" id="ref-for-code-point-substring">code point substring</a> from <var>position</var> to the end of <var>line</var>.</p>
             <li data-md>
-             <p>If <a data-link-type="dfn" href="#match-a-source-map-url-in-a-comment" id="ref-for-match-a-source-map-url-in-a-comment①">matching a Source Map URL in</a> <var>comment</var> returns a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②①">string</a>, set <var>lastURL</var> to it.</p>
+             <p>If <a data-link-type="dfn" href="#match-a-source-map-url-in-a-comment" id="ref-for-match-a-source-map-url-in-a-comment①">matching a Source Map URL in</a> <var>comment</var> returns a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②②">string</a>, set <var>lastURL</var> to it.</p>
             <li data-md>
              <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-break" id="ref-for-iteration-break①">Break</a>.</p>
            </ol>
@@ -3018,7 +3024,7 @@ white space code points</a> from <var>line</var> given <var>position</var>.</p>
            <p>Else if <var>second</var> is U+002A (*), then:</p>
            <ol>
             <li data-md>
-             <p>Let <var>comment</var> be the empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②②">string</a>.</p>
+             <p>Let <var>comment</var> be the empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②③">string</a>.</p>
             <li data-md>
              <p>While <var>position</var> + 1 doesn’t point past the end of <var>line</var>:</p>
              <ol>
@@ -3032,7 +3038,7 @@ white space code points</a> from <var>line</var> given <var>position</var>.</p>
                <p>If <var>c1</var> is U+002A (*) and <var>c2</var> is U+002F (/), then:</p>
                <ol>
                 <li data-md>
-                 <p>If <a data-link-type="dfn" href="#match-a-source-map-url-in-a-comment" id="ref-for-match-a-source-map-url-in-a-comment②">matching a Source Map URL in</a> <var>comment</var> returns a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②③">string</a>, set <var>lastURL</var> to it.</p>
+                 <p>If <a data-link-type="dfn" href="#match-a-source-map-url-in-a-comment" id="ref-for-match-a-source-map-url-in-a-comment②">matching a Source Map URL in</a> <var>comment</var> returns a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②④">string</a>, set <var>lastURL</var> to it.</p>
                 <li data-md>
                  <p>Increment <var>position</var> by 1.</p>
                </ol>
@@ -3089,7 +3095,7 @@ returning early after scanning through a line that contains a <code class="highl
 <c- k>return</c-> lastURL<c- p>;</c->
 </pre>
    </div>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="match-a-source-map-url-in-a-comment">match a Source Map URL in a comment</dfn> <var>comment</var> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②④">string</a>), run the following steps:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="match-a-source-map-url-in-a-comment">match a Source Map URL in a comment</dfn> <var>comment</var> (a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string②⑤">string</a>), run the following steps:</p>
    <ol>
     <li data-md>
      <p>Let <var>pattern</var> be the regular expression <code class="highlight"><c- sr>/^[@#]\s*sourceMappingURL=(\S*?)\s*$/</c-></code>.</p>
@@ -3411,6 +3417,7 @@ starting with the string <code class="highlight"><c- p>)]}</c->'</code> to the s
     </ul>
    <li><a href="#unambiguously-links-to-a-source-map">unambiguously links to a source map</a><span>, in § 5.2.2</span>
    <li><a href="#decoded-source-url">URL</a><span>, in § 3</span>
+   <li><a href="#validate-base64-vlq-groupings">validate base64 VLQ groupings</a><span>, in § 3.1</span>
    <li><a href="#json-version">version</a><span>, in § 3</span>
   </ul>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
@@ -3740,7 +3747,7 @@ function parseHTML(markup) {
 {
 let dfnPanelData = {
 "0204d188": {"dfnID":"0204d188","dfnText":"size","external":true,"refSections":[{"refs":[{"id":"ref-for-list-size"},{"id":"ref-for-list-size\u2460"},{"id":"ref-for-list-size\u2461"}],"title":"3.1. Mappings Structure"},{"refs":[{"id":"ref-for-list-size\u2462"}],"title":"3.2. Resolving Sources"}],"url":"https://infra.spec.whatwg.org/#list-size"},
-"0698d556": {"dfnID":"0698d556","dfnText":"string","external":true,"refSections":[{"refs":[{"id":"ref-for-string"},{"id":"ref-for-string\u2460"},{"id":"ref-for-string\u2461"},{"id":"ref-for-string\u2462"},{"id":"ref-for-string\u2463"},{"id":"ref-for-string\u2464"},{"id":"ref-for-string\u2465"},{"id":"ref-for-string\u2466"},{"id":"ref-for-string\u2467"},{"id":"ref-for-string\u2468"},{"id":"ref-for-string\u2460\u24ea"}],"title":"3. Source Map Format"},{"refs":[{"id":"ref-for-string\u2460\u2460"},{"id":"ref-for-string\u2460\u2461"},{"id":"ref-for-string\u2460\u2462"},{"id":"ref-for-string\u2460\u2463"}],"title":"3.1. Mappings Structure"},{"refs":[{"id":"ref-for-string\u2460\u2464"},{"id":"ref-for-string\u2460\u2465"},{"id":"ref-for-string\u2460\u2466"}],"title":"3.2. Resolving Sources"},{"refs":[{"id":"ref-for-string\u2460\u2467"},{"id":"ref-for-string\u2460\u2468"},{"id":"ref-for-string\u2461\u24ea"},{"id":"ref-for-string\u2461\u2460"},{"id":"ref-for-string\u2461\u2461"},{"id":"ref-for-string\u2461\u2462"},{"id":"ref-for-string\u2461\u2463"}],"title":"5.2.2.1. Extraction methods for JavaScript sources"}],"url":"https://infra.spec.whatwg.org/#string"},
+"0698d556": {"dfnID":"0698d556","dfnText":"string","external":true,"refSections":[{"refs":[{"id":"ref-for-string"},{"id":"ref-for-string\u2460"},{"id":"ref-for-string\u2461"},{"id":"ref-for-string\u2462"},{"id":"ref-for-string\u2463"},{"id":"ref-for-string\u2464"},{"id":"ref-for-string\u2465"},{"id":"ref-for-string\u2466"},{"id":"ref-for-string\u2467"},{"id":"ref-for-string\u2468"},{"id":"ref-for-string\u2460\u24ea"}],"title":"3. Source Map Format"},{"refs":[{"id":"ref-for-string\u2460\u2460"},{"id":"ref-for-string\u2460\u2461"},{"id":"ref-for-string\u2460\u2462"},{"id":"ref-for-string\u2460\u2463"},{"id":"ref-for-string\u2460\u2464"}],"title":"3.1. Mappings Structure"},{"refs":[{"id":"ref-for-string\u2460\u2465"},{"id":"ref-for-string\u2460\u2466"},{"id":"ref-for-string\u2460\u2467"}],"title":"3.2. Resolving Sources"},{"refs":[{"id":"ref-for-string\u2460\u2468"},{"id":"ref-for-string\u2461\u24ea"},{"id":"ref-for-string\u2461\u2460"},{"id":"ref-for-string\u2461\u2461"},{"id":"ref-for-string\u2461\u2462"},{"id":"ref-for-string\u2461\u2463"},{"id":"ref-for-string\u2461\u2464"}],"title":"5.2.2.1. Extraction methods for JavaScript sources"}],"url":"https://infra.spec.whatwg.org/#string"},
 "08b51e40": {"dfnID":"08b51e40","dfnText":"processresponseconsumebody","external":true,"refSections":[{"refs":[{"id":"ref-for-process-response-end-of-body"}],"title":"8. Fetching Source Maps"}],"url":"https://fetch.spec.whatwg.org/#process-response-end-of-body"},
 "1243a891": {"dfnID":"1243a891","dfnText":"exist","external":true,"refSections":[{"refs":[{"id":"ref-for-map-exists"},{"id":"ref-for-map-exists\u2460"},{"id":"ref-for-map-exists\u2461"},{"id":"ref-for-map-exists\u2462"},{"id":"ref-for-map-exists\u2463"},{"id":"ref-for-map-exists\u2464"},{"id":"ref-for-map-exists\u2465"}],"title":"3. Source Map Format"}],"url":"https://infra.spec.whatwg.org/#map-exists"},
 "16d07e10": {"dfnID":"16d07e10","dfnText":"for each","external":true,"refSections":[{"refs":[{"id":"ref-for-list-iterate"},{"id":"ref-for-list-iterate\u2460"},{"id":"ref-for-list-iterate\u2461"}],"title":"3. Source Map Format"},{"refs":[{"id":"ref-for-list-iterate\u2462"}],"title":"3.1. Mappings Structure"},{"refs":[{"id":"ref-for-list-iterate\u2463"}],"title":"3.2. Resolving Sources"},{"refs":[{"id":"ref-for-list-iterate\u2464"},{"id":"ref-for-list-iterate\u2465"}],"title":"5.2.2.1. Extraction methods for JavaScript sources"},{"refs":[{"id":"ref-for-list-iterate\u2466"}],"title":"5.2.2.3. Extraction methods for WebAssembly binaries"}],"url":"https://infra.spec.whatwg.org/#list-iterate"},
@@ -3782,7 +3789,7 @@ let dfnPanelData = {
 "b184d4e1": {"dfnID":"b184d4e1","dfnText":"divpunctuator","external":true,"refSections":[{"refs":[{"id":"ref-for-prod-DivPunctuator"}],"title":"3.1.1. Mappings for generated JavaScript code"}],"url":"https://tc39.es/ecma262/#prod-DivPunctuator"},
 "b262501e": {"dfnID":"b262501e","dfnText":"reject","external":true,"refSections":[{"refs":[{"id":"ref-for-reject"},{"id":"ref-for-reject\u2460"}],"title":"8. Fetching Source Maps"}],"url":"https://webidl.spec.whatwg.org/#reject"},
 "b9a3febe": {"dfnID":"b9a3febe","dfnText":"privateidentifier","external":true,"refSections":[{"refs":[{"id":"ref-for-prod-PrivateIdentifier"}],"title":"3.1.1. Mappings for generated JavaScript code"}],"url":"https://tc39.es/ecma262/#prod-PrivateIdentifier"},
-"base64-vlq": {"dfnID":"base64-vlq","dfnText":"Base64 VLQ","external":false,"refSections":[{"refs":[{"id":"ref-for-base64-vlq"},{"id":"ref-for-base64-vlq\u2460"}],"title":"2. Terms and definitions"},{"refs":[{"id":"ref-for-base64-vlq\u2461"},{"id":"ref-for-base64-vlq\u2462"},{"id":"ref-for-base64-vlq\u2463"},{"id":"ref-for-base64-vlq\u2464"},{"id":"ref-for-base64-vlq\u2465"}],"title":"3.1. Mappings Structure"}],"url":"#base64-vlq"},
+"base64-vlq": {"dfnID":"base64-vlq","dfnText":"Base64 VLQ","external":false,"refSections":[{"refs":[{"id":"ref-for-base64-vlq"},{"id":"ref-for-base64-vlq\u2460"}],"title":"2. Terms and definitions"},{"refs":[{"id":"ref-for-base64-vlq\u2461"},{"id":"ref-for-base64-vlq\u2462"},{"id":"ref-for-base64-vlq\u2463"},{"id":"ref-for-base64-vlq\u2464"},{"id":"ref-for-base64-vlq\u2465"},{"id":"ref-for-base64-vlq\u2466"}],"title":"3.1. Mappings Structure"}],"url":"#base64-vlq"},
 "bb1f9628": {"dfnID":"bb1f9628","dfnText":"code point substring","external":true,"refSections":[{"refs":[{"id":"ref-for-code-point-substring"}],"title":"5.2.2.1. Extraction methods for JavaScript sources"}],"url":"https://infra.spec.whatwg.org/#code-point-substring"},
 "be284f27": {"dfnID":"be284f27","dfnText":"identifiername","external":true,"refSections":[{"refs":[{"id":"ref-for-prod-IdentifierName"}],"title":"3.1.1. Mappings for generated JavaScript code"}],"url":"https://tc39.es/ecma262/#prod-IdentifierName"},
 "c755425c": {"dfnID":"c755425c","dfnText":"template","external":true,"refSections":[{"refs":[{"id":"ref-for-prod-Template"}],"title":"3.1.1. Mappings for generated JavaScript code"}],"url":"https://tc39.es/ecma262/#prod-Template"},
@@ -3841,7 +3848,7 @@ let dfnPanelData = {
 "json-mappings": {"dfnID":"json-mappings","dfnText":"mappings","external":false,"refSections":[{"refs":[{"id":"ref-for-json-mappings"},{"id":"ref-for-json-mappings\u2460"}],"title":"3. Source Map Format"},{"refs":[{"id":"ref-for-json-mappings\u2461"}],"title":"3.1. Mappings Structure"}],"url":"#json-mappings"},
 "json-names": {"dfnID":"json-names","dfnText":"names","external":false,"refSections":[{"refs":[{"id":"ref-for-json-names"}],"title":"3.1. Mappings Structure"}],"url":"#json-names"},
 "json-sourceroot": {"dfnID":"json-sourceroot","dfnText":"sourceRoot","external":false,"refSections":[{"refs":[{"id":"ref-for-json-sourceroot"}],"title":"3.2. Resolving Sources"}],"url":"#json-sourceroot"},
-"json-sources": {"dfnID":"json-sources","dfnText":"sources","external":false,"refSections":[{"refs":[{"id":"ref-for-json-sources"},{"id":"ref-for-json-sources\u2460"},{"id":"ref-for-json-sources\u2461"}],"title":"3. Source Map Format"},{"refs":[{"id":"ref-for-json-sources\u2462"}],"title":"3.1. Mappings Structure"}],"url":"#json-sources"},
+"json-sources": {"dfnID":"json-sources","dfnText":"sources","external":false,"refSections":[{"refs":[{"id":"ref-for-json-sources"},{"id":"ref-for-json-sources\u2460"},{"id":"ref-for-json-sources\u2461"},{"id":"ref-for-json-sources\u2462"}],"title":"3. Source Map Format"},{"refs":[{"id":"ref-for-json-sources\u2463"}],"title":"3.1. Mappings Structure"}],"url":"#json-sources"},
 "json-sourcescontent": {"dfnID":"json-sourcescontent","dfnText":"sourcesContent","external":false,"refSections":[{"refs":[{"id":"ref-for-json-sourcescontent"}],"title":"5.2. Linking generated code to source maps"}],"url":"#json-sourcescontent"},
 "json-version": {"dfnID":"json-version","dfnText":"version","external":false,"refSections":[{"refs":[{"id":"ref-for-json-version"}],"title":"4. Index Map"}],"url":"#json-version"},
 "map": {"dfnID":"map","dfnText":"map","external":false,"refSections":[{"refs":[{"id":"ref-for-map"},{"id":"ref-for-map\u2460"},{"id":"ref-for-map\u2461"},{"id":"ref-for-map\u2462"},{"id":"ref-for-map\u2463"},{"id":"ref-for-map\u2464"}],"title":"3. Source Map Format"}],"url":"#map"},
@@ -3857,6 +3864,7 @@ let dfnPanelData = {
 "source-mapping-url": {"dfnID":"source-mapping-url","dfnText":"Source Mapping URL","external":false,"refSections":[{"refs":[{"id":"ref-for-source-mapping-url"},{"id":"ref-for-source-mapping-url\u2460"}],"title":"5.2. Linking generated code to source maps"}],"url":"#source-mapping-url"},
 "source-origin": {"dfnID":"source-origin","dfnText":"source origin","external":false,"refSections":[{"refs":[{"id":"ref-for-source-origin"},{"id":"ref-for-source-origin\u2460"},{"id":"ref-for-source-origin\u2461"},{"id":"ref-for-source-origin\u2462"},{"id":"ref-for-source-origin\u2463"}],"title":"5.2. Linking generated code to source maps"}],"url":"#source-origin"},
 "unambiguously-links-to-a-source-map": {"dfnID":"unambiguously-links-to-a-source-map","dfnText":"unambiguously links to a source map","external":false,"refSections":[{"refs":[{"id":"ref-for-unambiguously-links-to-a-source-map"},{"id":"ref-for-unambiguously-links-to-a-source-map\u2460"},{"id":"ref-for-unambiguously-links-to-a-source-map\u2461"}],"title":"5.2.2. Linking through inline annotations"}],"url":"#unambiguously-links-to-a-source-map"},
+"validate-base64-vlq-groupings": {"dfnID":"validate-base64-vlq-groupings","dfnText":"validate base64 VLQ groupings","external":false,"refSections":[{"refs":[{"id":"ref-for-validate-base64-vlq-groupings"}],"title":"3.1. Mappings Structure"}],"url":"#validate-base64-vlq-groupings"},
 };
 
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -4296,6 +4304,7 @@ let refsData = {
 "#source-mapping-url": {"export":true,"for_":[],"level":"","normative":true,"shortname":"source-map","spec":"source-map","status":"local","text":"source mapping url","type":"dfn","url":"#source-mapping-url"},
 "#source-origin": {"export":true,"for_":[],"level":"","normative":true,"shortname":"source-map","spec":"source-map","status":"local","text":"source origin","type":"dfn","url":"#source-origin"},
 "#unambiguously-links-to-a-source-map": {"export":true,"for_":[],"level":"","normative":true,"shortname":"source-map","spec":"source-map","status":"local","text":"unambiguously links to a source map","type":"dfn","url":"#unambiguously-links-to-a-source-map"},
+"#validate-base64-vlq-groupings": {"export":true,"for_":[],"level":"","normative":true,"shortname":"source-map","spec":"source-map","status":"local","text":"validate base64 vlq groupings","type":"dfn","url":"#validate-base64-vlq-groupings"},
 "https://encoding.spec.whatwg.org/#utf-8-decode-without-bom-or-fail": {"export":true,"for_":[],"level":"1","normative":true,"shortname":"encoding","spec":"encoding","status":"current","text":"utf-8 decode without bom or fail","type":"dfn","url":"https://encoding.spec.whatwg.org/#utf-8-decode-without-bom-or-fail"},
 "https://fetch.spec.whatwg.org/#concept-fetch": {"export":true,"for_":[],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"fetch","type":"dfn","url":"https://fetch.spec.whatwg.org/#concept-fetch"},
 "https://fetch.spec.whatwg.org/#concept-request": {"export":true,"for_":[],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"request","type":"dfn","url":"https://fetch.spec.whatwg.org/#concept-request"},
