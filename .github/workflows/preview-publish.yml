@@ -1,0 +1,17 @@
+name: Publish preview
+on:
+  push:
+    branches:
+      - "preview-*"
+jobs:
+  main:
+    name: Build, Validate and Deploy to branch
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: w3c/spec-prod@v2
+        with:
+          GH_PAGES_BRANCH: ${{ format('gh-pages-{0}', github.ref_name) }}
+          TOOLCHAIN: bikeshed
+          SOURCE: source-map.bs
+          DESTINATION: 'index.html'
