@@ -348,8 +348,10 @@ following structure:
   "sources": ["foo.js", "bar.js"],
   "sourcesContent": [null, null],
   "names": ["src", "maps", "are", "fun"],
-  "mappings": "A,AAAB;;ABCDE"
-  "ignoreList": [0]
+  "mappings": "A,AAAB;;ABCDE",
+  "ignoreList": [0],
+  "originalScopes": ["", ""],
+  "generatedRanges": ""
 }
 ```
 
@@ -379,7 +381,13 @@ following structure:
     It refers to the [=json/sources=] array and lists the indices of all the known third-party sources
     in the source map. Some browsers may also use the deprecated <code>x_google_ignoreList</code>
     field if <code>[=json/ignoreList=]</code> is not present.
-
+* <dfn for="json"><code>originalScopes</code></dfn> an optional list of encoded original
+    scopes. The encoded scopes are listed in the same order as the [=json/sources=] and
+    describe the scope tree for the respective original source file.
+* <dfn for="json"><code>generatedRanges</code></dfn> an optional string of generated ranges.
+    Generated ranges describe the scope structure of the generated code and how it
+    relates to the original scope trees. They are called "ranges" because they don't
+    necessarily correspond to syntactical scopes in the generated language.
 
 A <dfn export>decoded source map</dfn> is a [=struct=] with the following fields:
 <dl dfn-for="decoded source map">
@@ -391,6 +399,12 @@ A <dfn export>decoded source map</dfn> is a [=struct=] with the following fields
 
   <dt><dfn>mappings</dfn></dt>
   <dd>A [=list=] of [=decoded mapping|decoded mappings=].</dd>
+
+  <dt><dfn>originalScopes</dfn></dt>
+  <dd>A [=list=] of [=decoded original scope|decoded original scopes=].</dd>
+
+  <dt><dfn>generatedRanges</dfn></dt>
+  <dd>A [=list=] of [=decoded generated range|decoded generated ranges=].</dd>
 </dl>
 
 A <dfn>decoded source</dfn> is a [=struct=] with the following fields:
@@ -438,6 +452,12 @@ To <dfn export>decode a source map</dfn> given a [=string=]-keyed [=/map=] |json
     - [=decode source map mappings/names=] set to [=optionally get a list of strings=] `"names"`
         from |jsonMap|;
     - [=decode source map mappings/sources=] set to |sourceMap|'s [=decoded source map/sources=].
+1. Set |sourceMap|'s [=decoded source map/originalScopes=] to the result of
+    [=decode source map original scopes|decoding source map original scopes=] with:
+    - [=decode source map original scopes/originalScopes=] set to
+        [=optionally get a list of optional strings=] `"originalScopes"` from |jsonMap|.
+    - [=decode source map original scopes/names=] set to [=optionally get a list of strings=] `"names"`
+        from |jsonMap|;
 1. Return |sourceMap|.
 
 To <dfn>optionally get a string</dfn> |key| from a [=string=]-keyed [=/map=] |jsonMap|, run the
@@ -576,13 +596,10 @@ sources=] <dfn for="decode source map mappings">|sources|</dfn>, run the followi
             |groups|[|generatedLine|] on `,`.
         1. Let |generatedColumn| be 0.
         1. [=For each=] |segment| in |segments|:
-            1. Let |position| be a [=position variable=] for |segment|, initially pointing at
-                |segment|'s start.
-            1. [=Decode a base64 VLQ=] from |segment| given |position| and let
-                |relativeGeneratedColumn| be the result.
-            1. If |relativeGeneratedColumn| is null, [=optionally report an error=] and continue
-                with the next iteration.
-            1. Increase |generatedColumn| by |relativeGeneratedColumn|. If the result is negative,
+            1. [=Decode a list of base64 VLQ=] from |segment| and let |vlqs| be the result.
+            1. If |vlqs|'s [=list/size=] is not 1, 4 or 5, [=optionally report an error=]
+                and continue with the next iteration.
+            1. Increase |generatedColumn| by |vlqs[0]|. If the result is negative,
                 [=optionally report an error=] and continue with the next iteration.
             1. Let |decodedMapping| be a new [=decoded mapping=] whose
                 [=decoded mapping/generatedLine=] is |generatedLine|,
@@ -592,18 +609,10 @@ sources=] <dfn for="decode source map mappings">|sources|</dfn>, run the followi
                 [=decoded mapping/originalColumn=] is null,
                 and [=decoded mapping/name=] is null.
             1. Append |decodedMapping| to |decodedMappings|.
-            1. [=Decode a base64 VLQ=] from |segment| given |position| and let |relativeSourceIndex|
-                be the result.
-            1. [=Decode a base64 VLQ=] from |segment| given |position| and let
-                |relativeOriginalLine| be the result.
-            1. [=Decode a base64 VLQ=] from |segment| given |position| and let
-                |relativeOriginalColumn| be the result.
-            1. If |relativeOriginalColumn| is null, then:
-                1. If |relativeSourceIndex| is not null, [=optionally report an error=].
-                1. Continue with the next iteration.
-            1. Increase |sourceIndex| by |relativeSourceIndex|.
-            1. Increase |originalLine| by |relativeOriginalLine|.
-            1. Increase |originalColumn| by |relativeOriginalColumn|.
+            1. If |vlqs|'s [=list/size=] is 1, continue with the next iteration.
+            1. Increase |sourceIndex| by |vlqs[1]|.
+            1. Increase |originalLine| by |vlqs[2]|.
+            1. Increase |originalColumn| by |vlqs[3]|.
             1. If any of |sourceIndex|, |originalLine|, or |originalColumn| are less than 0, or if
                 |sourceIndex| is greater than or equal to |sources|'s [=list/size=], [=optionally
                 report an error=].
@@ -612,15 +621,11 @@ sources=] <dfn for="decode source map mappings">|sources|</dfn>, run the followi
                     |sources|[|sourceIndex|].
                 1. Set |decodedMapping|'s [=decoded mapping/originalLine=] to |originalLine|.
                 1. Set |decodedMapping|'s [=decoded mapping/originalColumn=] to |originalColumn|.
-            1. [=Decode a base64 VLQ=] from |segment| given |position| and let |relativeNameIndex|
-                be the result.
-            1. If |relativeNameIndex| is not null, then:
-                1. Increase |nameIndex| by |relativeNameIndex|.
-                1. If |nameIndex| is negative or greater than |names|'s [=list/size=], [=optionally
-                    report an error=].
-                1. Else, set |decodedMapping|'s [=decoded mapping/name=] to |names|[|nameIndex|].
-            1. If |position| does not point to the end of |segment|, [=optionally report an
-                error=].
+            1. If |vlqs|'s [=list/size=] is 4, continue with the next iteration.
+            1. Increase |nameIndex| by |vlqs[4]|.
+            1. If |nameIndex| is negative or greater than |names|'s [=list/size=],
+                [=optionally report an error=].
+            1. Else, set |decodedMapping|'s [=decoded mapping/name=] to |names|[|nameIndex|].
     1. Increase |generatedLine| by 1.
 1. Return |decodedMappings|.
 
@@ -666,6 +671,16 @@ To <dfn>decode a base64 VLQ</dfn> from a [=string=] |segment| given a [=position
 
 NOTE: In addition to returning the decoded value, this algorithm updates the [=position variable=]
 in the calling algorithm.
+
+To <dfn>decode a list of base64 VLQ</dfn> from a [=string=] |segment|, run the following steps:
+1. Let |position| be a [=position variable=] for |segment|, initially pointing at
+    |segment|'s start.
+1. Let |vlqs| be a new empty [=list=].
+1. While |position| does not point to the end of |segment|:
+    1. [=Decode a base64 VLQ=] from |segment| given |position| and let |vlq| be the result.
+    1. Assert |vlq| is not null.
+    1. Append |vlq| to |vlqs|.
+1. Return |vlqs|.
 
 ### [=decoded mapping|Mappings=] for generated JavaScript code ### {#mappings-javascript}
 
@@ -743,6 +758,227 @@ encoded as 0 (`A`).
     Source map generators may chose to additionally emit a named [=decoded mapping|mapping=] on the opening parenthesis `(`.
 
 1. Source map generators may emit named [=decoded mapping|mappings=] for [=IdentifierReference=] in [=Expression=].
+
+Original Scope Structure {#original-scope-structure}
+----------------------------------------------------
+
+The [=json/originalScopes=] data is broken down as follows:
+
+- each original scope tree is either a [=string=] or null
+- each item is separated by a comma (`,`). An item can either be a "start" item or an "end" item.
+- each "start" item is made up of at least 4 variable length fields
+- each "end" item is made up of 2 variable length fields
+
+Each original scope is described by a pair of "start" and "end" items. The tree structure of the
+original scope tree is created by nesting "start" and "end" items appropriately.
+
+The fields in a "start" item are:
+
+1. The zero based line in the original code where this original scope starts.
+
+1. The zero based column in the original code where this original scope starts.
+
+1. The "kind" of this scope. It is a zero based index into [=json/names=].
+
+1. Field flags.
+
+1. Name
+
+1. Variables
+
+The fields in an "end" item are:
+
+1. The zero based line in the original code where this original scope starts.
+
+1. The zero based column in the original code where this original scope starts.
+
+A <dfn>decoded original scope</dfn> is a [=struct=] with the following fields:
+<dl dfn-for="decoded original scope">
+  <dt><dfn>startLine</dfn></dt>
+  <dd>A non-negative integer.</dd>
+
+  <dt><dfn>startColumn</dfn></dt>
+  <dd>A non-negative integer.</dd>
+
+  <dt><dfn>endLine</dfn></dt>
+  <dd>A non-negative integer.</dd>
+
+  <dt><dfn>endColumn</dfn></dt>
+  <dd>A non-negative integer.</dd>
+
+  <dt><dfn>kind</dfn></dt>
+  <dd>A [=string=].</dd>
+
+  <dt><dfn>name</dfn></dt>
+  <dd>A [=string=] or null.</dd>
+  
+  <dt><dfn>variables</dfn></dt>
+  <dd>A [=list=] of [=strings=].</dd>
+
+  <dt><dfn>children</dfn></dt>
+  <dd>A [=list=] of [=decoded original scope=].</dd>
+</dl>
+
+To <dfn>decode source map original scopes</dfn> given a [=list=] of [=strings=] and nulls
+<dfn for="decode source map original scopes">|originalScopes|</dfn>, and a [=list=] of [=strings=]
+<dfn for="decode source map original scopes">|names|</dfn>, run the following steps:
+1. Let |decodedOriginalScopes| be a new empty [=list=].
+1. [=For each=] |originalScopeTree| in [=decode source map original scopes/originalScopes=]:
+    1. If |originalScopeTree| is null, append null to |decodedOriginalScopes|.
+    1. Else,
+        1. Let |decodedOriginalScope| be the result of [=decode source map original scope=] with:
+            - [=decode source map original scope/originalScope=] set to |originalScopeTree|,
+            - [=decode source map original scope/names=] set to |names|.
+        1. Append |decodedOriginalScope| to |decodedOriginalScopes|.
+1. Return |decodedOriginalScopes|
+
+To <dfn>decode source map original scope</dfn> given a [=string=] <dfn for="decode source map original scope">|originalScope|</dfn>,
+and a [=list=] of [=strings=] <dfn for="decode source map original scope">|names|</dfn>, run the following steps:
+1. [=Validate base64 VLQ groupings=] with |originalScope|.
+1. If |originalScope| contains the [=code unit=] U+003B (;), throw an error.
+1. Let |scopeStack| be a new empty [=stack=].
+1. Let |items| be the result of [=strictly split|strictly splitting=] |originalScope| on `,`.
+1. Let |line| be 0.
+1. Let |kindIndex| be 0.
+1. [=For each=] |item| of |items|:
+    1. Let |position| be a [=position variable=] for |item|, initially pointing at |item|'s start.
+    1. [=Decode a list of base64 VLQ=] from |segment| and let |vlqs| be the result converted to a [=queue=].
+    1. [=queue/Dequeue=] from |vlqs| as |relativeLine|.
+    1. [=queue/Dequeue=] from |vlqs| as |column|.
+    1. If |relativeLine| or |column| is null, throw an error.
+    1. Increase |line| by |relativeLine|.
+    1. If |vlqs| is [=list/empty=], then:
+        1. [=stack/Pop=] from |scopeStack| as |scope|.
+        1. If |scopeStack| is null, throw an error.
+        1. Set |scope|'s [=decoded original scope/endLine=] to |line|.
+        1. Set |scope|'s [=decoded original scope/endColumn=] to |column|.
+        1. If |scopeStack| is empty, then return |scope|.
+        1. [=stack/Peek=] from |scopeStack| as |parentScope|.
+        1. [=list/Append=] |scope| to |parentScope|'s [=decoded original scope/children=].
+    1. Else,
+        1. [=queue/Dequeue=] from |vlqs| as |relativeKindIndex|.
+        1. [=queue/Dequeue=] from |vlqs| as |flags|.
+        1. If |relativeKindIndex| or |flags| is null, throw an error.
+        1. Increase |kindIndex| by |relativeKindIndex|.
+        1. If |names|[|kindIndex|] does not [=list/exist=], throw an error.
+        1. Let |kind| be |names|[|kindIndex|].
+        1. If |flags| & 0x1 is 0x1, [=queue/dequeue=] from |vlqs| as |nameIndex|.
+        1. Let |name| be |names|[|nameIndex|] if |names|[|nameIndex|] exists; null otherwise.
+        1. Let |variables| be a new empty [=list=].
+        1. While |vlqs| is not [=list/empty=]:
+            1. [=queue/Dequeue=] from |vlqs| as |variableIndex|.
+            1. If |names|[|variableIndex|] does not [=list/exist=], throw an error.
+            1. [=list/Append=] |names|[|variableIndex|] to |variables|.
+        1. Let |scope| be a new [=decoded original scope=] whose
+            [=decoded original scope/startLine=] is |line|,
+            [=decoded original scope/startColumn=] is |column|,
+            [=decoded original scope/endLine=] is null,
+            [=decoded original scope/endColumn=] is null,
+            [=decoded original scope/kind=] is |kind|,
+            [=decoded original scope/name=] is |name|,
+            and [=decoded original scope/variables=] is |variables|.
+        1. [=stack/Push=] |scope| onto |scopeStack|.
+1. Throw an error.
+
+Note: The [=decode source map original scope=] algorithm implicitly ignores all
+top-level scopes except for the first, and throws an error if "start"/"end" items
+don't occur in pairs.
+
+Generated Range Structure {#generated-range-structure}
+------------------------------------------------------
+
+The [=json/generatedRanges=] data is broken down as follows:
+
+- each group representing a line in the generated file is separated by a semicolon (`;`).
+- each item is separated by a comma (`,`). An item can either be a "start" item or an "end" item.
+- each "start" item is made up of at least 2 variable length fields.
+- each "end" item is made up of 1 variable length field.
+
+Each generated range is described by a pair of "start" and "end" items. The tree structure of the
+generated range tree is created by nesting "start" and "end" items appropriately.
+
+Note: [=json/generatedRanges=] is allowed to describe multiple top-level generated ranges. This
+is different from original scopes. In practice this can occur when concatenating multiple files
+into a single bundle.
+
+The fields in a "start" item are:
+
+The fields in an "end" item are:
+
+A <dfn>decoded generated range</dfn> is a [=struct=] with the following fields:
+<dl dfn-for="decoded generated range">
+  <dt><dfn>startLine</dfn></dt>
+  <dd>A non-negative integer.</dd>
+
+  <dt><dfn>startColumn</dfn></dt>
+  <dd>A non-negative integer.</dd>
+
+  <dt><dfn>endLine</dfn></dt>
+  <dd>A non-negative integer.</dd>
+
+  <dt><dfn>endColumn</dfn></dt>
+  <dd>A non-negative integer.</dd>
+
+  <dt><dfn>originalScope</dfn></dt>
+  <dd>A [=decoded original scope=] or null.</dd>
+  
+  <dt><dfn>callSiteSourceIndex</dfn></dt>
+  <dd>A non-negative integer or null.</dd>
+
+  <dt><dfn>callSiteLine</dfn></dt>
+  <dd>A non-negative integer or null.</dd>
+
+  <dt><dfn>callSiteColumn</dfn></dt>
+  <dd>A non-negative integer or null.</dd>
+
+  <dt><dfn>values</dfn></dt>
+  <dd>A [=list=] containing null, [=string=] or [=decoded binding range=]</dd>
+  
+  <dt><dfn>children</dfn></dt>
+  <dd>A [=list=] of [=decoded generated range=]</dd>
+</dl>
+
+For any [=decoded generated range=], the following invariants must hold:
+- For the fields [=decoded generated range/callSiteSourceIndex=], [=decoded generated range/callSiteLine=], and
+    [=decoded generated range/callSiteColumn=]: all 3 must be either null, or all 3 must be a non-negative integer.
+- If [=decoded generated range/originalScope=] is not null, then [=decoded generated range/originalScope=]'s
+    [=decoded original scope/variables=]'s [=list/size=] must be equal to [=decoded generated range/values=]'s [=list/size=].
+
+To <dfn>decode source map generated ranges</dfn> given a [=strings=]
+<dfn for="decode source map generated ranges">|generatedRanges|</dfn>, and a [=list=] of [=strings=]
+<dfn for="decode source map generated ranges">|names|</dfn>, run the following steps:
+1. [=Validate base64 VLQ groupings=] with |generatedRanges|.
+1. Let |decodedRanges| be a new empty [=list=].
+1. Let |rangeStack| be a new empty [=stack=].
+1. Let |groups| be the result of [=strictly split|strictly splitting=] |generatedRanges| on `;`.
+1. Let |line| be 0.
+1. Let |definitionSourceIndex| be 0.
+1. Let |definitionScopeIndex| be 0.
+1. Let |callSiteSourceIndex| be 0.
+1. Let |callSiteLine| be 0.
+1. Let |callSiteColumn| be 0.
+1. While |line| is less than |groups|'s [=list/size=]:
+    1. If |groups|[|line|] is the empty string, then increase |line| by 1 and continue with the next iteration.
+    1. Let |segments| be the result of [=strictly split|strictly splitting=] |groups|[|line|] on `,`.
+    1. Let |column| be 0.
+    1. [=For each=] |segment| in |segments|:
+        1. [=Decode a list of base64 VLQ=] from |segment| and let |vlqs| be the result converted to a [=queue=].
+        1. If |vlqs| is [=list/empty=], throw an error.
+        1. Increase |column| by the result of [=queue/dequeue=] |vlqs|.
+        1. If |vlqs| is [=list/empty=], then:
+            1. [=stack/Pop=] from |rangeStack| as |range|.
+            1. If |range| is null, throw an error.
+            1. Set |ranges|'s [=decoded generated range/endLine=] to |line|.
+            1. Set |scope|'s [=decoded generated range/endColumn=] to |column|.
+            1. If |rangeStack| is [=list/empty=], then [=list/append=] |range| to |decodedRanges|.
+            1. Else,
+                1. [=stack/Peek=] from |rangeStack| as |parentRange|.
+                1. [=list/Append=] |range| to |parentRange|'s [=decoded generated range/children=].
+        1. Else,
+            1. bar
+    1. Increase |line| by 1.
+1. If |rangeStack| is not [=list/empty=], throw an error.
+1. Return |decodedRanges|.
 
 Resolving Sources {#resolving-sources}
 --------------------------------------
