@@ -5571,7 +5571,7 @@ h1.version {
 
       <emu-clause id="sec-vendor-extension-item-grammar">
         <h1><span class="secnum">9.3.3.3</span> Vendor extension item grammar</h1>
-        <p>The specification reserves the <code>/</code> tag for vendor-specific extension items. <emu-nt id="_ref_621"><a href="#prod-VendorExtensionName">VendorExtensionName</a></emu-nt> must be interpreted with <emu-xref aoid="VLQUnsignedValue" id="_ref_244"><a href="#sec-VLQUnsignedValue">VLQUnsignedValue</a></emu-xref> and is an absolute index into <emu-xref href="#json-names" id="_ref_14"><a href="#json-names">names</a></emu-xref>.</p>
+        <p>The specification reserves the <code>/</code> tag for vendor-specific extension items. <emu-nt id="_ref_621"><a href="#prod-VendorExtensionName">VendorExtensionName</a></emu-nt> must be interpreted with <emu-xref aoid="VLQUnsignedValue" id="_ref_244"><a href="#sec-VLQUnsignedValue">VLQUnsignedValue</a></emu-xref> and is an absolute index into the <emu-xref href="#json-names" id="_ref_14"><a href="#json-names">names</a></emu-xref> array. The corresponding string identifies the vendor-specific item.</p>
         <emu-grammar type="definition"><emu-production name="VendorExtensionItem" id="prod-VendorExtensionItem">
     <emu-nt><a href="#prod-VendorExtensionItem">VendorExtensionItem</a></emu-nt> <emu-geq>:</emu-geq> <emu-rhs a="mvppwvgx">
         <emu-t>/</emu-t>
